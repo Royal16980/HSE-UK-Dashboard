@@ -41,4 +41,28 @@ jobs:
           git add data/reference/*.parquet || true
           git commit -m "data: weekly refresh" || echo "Nothing new to commit"
           git push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # <-- lets the action push back to the repo
+    steps:
+      …                       # (everything above stays the same)
+
+      # 5  Commit refreshed artefacts
+      - name: Commit updated dashboard
+        run: |
+          git config user.name  github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+          # add docs/ (always exists)
+          git add docs/*
+
+          # only add reference parquet files if any are present
+          if compgen -G "data/reference/*.parquet" > /dev/null; then
+            git add data/reference/*.parquet
+          fi
+
+          git commit -m "data: weekly refresh" || echo "Nothing new to commit"
+          git push
 
