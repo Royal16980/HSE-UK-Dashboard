@@ -1,52 +1,17 @@
-name: weekly-refresh
-on:
-  # every Monday 05:00 UTC  (06:00 UK)
-  schedule:
-    - cron: '0 5 * * 1'
-  workflow_dispatch:        # adds the “Run workflow” button
+# 3  Install libraries  (unchanged…)
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write        # ← lets the workflow push back to the repo
+# 4  Fetch all external datasets
+- name: Fetch public datasets
+  run: |
+    python scripts/fetch_la_centroids.py
+    python scripts/fetch_population.py
+    python scripts/fetch_riddor.py
+    python scripts/fetch_imd.py
+    python scripts/fetch_companies.py
+    python scripts/fetch_fatals.py
 
-    steps:
-      # 1  Check out repo (pulls LFS files too)
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      # 2  Install Python
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      # 3  Install libraries
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # 4  Run the build scripts
-      - name: Build CSV + dashboard
-        run: |
-          python scripts/build_csv.py
-          python scripts/build_dashboard.py
-
-      # 5  Commit refreshed artefacts back to the repo
-      - name: Commit updated dashboard
-        run: |
-          git config user.name  github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
-          # add docs/ (always exists)
-          git add docs/*
-
-          # only add reference parquet files if any are present
-          if compgen -G "data/reference/*.parquet" > /dev/null; then
-            git add data/reference/*.parquet
-          fi
-
-          git commit -m "data: weekly refresh" || echo "Nothing new to commit"
-          git push
+# 5  Build CSV + dashboard
+- name: Build CSV + dashboard
+  run: |
+    python scripts/build_csv.py
+    python scripts/build_dashboard.py
