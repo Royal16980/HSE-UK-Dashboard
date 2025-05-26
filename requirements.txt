@@ -6,3 +6,7 @@ rapidfuzz
 tqdm
 requests
 pyarrow           # for Parquet
+beautifulsoup4
+lxml
+pdfplumber        # reads the HMCTS PDFs
+tqdm
