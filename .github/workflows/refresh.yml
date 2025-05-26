@@ -1,17 +1,53 @@
-# 3  Install libraries  (unchanged…)
+name: weekly-refresh
+on:
+  # every Monday 05:00 UTC  (06:00 UK)
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:      # adds the “Run workflow” button
 
-# 4  Fetch all external datasets
-- name: Fetch public datasets
-  run: |
-    python scripts/fetch_la_centroids.py
-    python scripts/fetch_population.py
-    python scripts/fetch_riddor.py
-    python scripts/fetch_imd.py
-    python scripts/fetch_companies.py
-    python scripts/fetch_fatals.py
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # allow the action to push back to the repo
 
-# 5  Build CSV + dashboard
-- name: Build CSV + dashboard
-  run: |
-    python scripts/build_csv.py
-    python scripts/build_dashboard.py
+    steps:
+      # 1  Check out repo (pulls LFS files too)
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # 2  Install Python
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3  Install libraries
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4  Fetch all external datasets
+      - name: Fetch public datasets
+        run: |
+          python scripts/fetch_la_centroids.py
+          python scripts/fetch_population.py
+          python scripts/fetch_riddor.py
+          python scripts/fetch_imd.py
+          python scripts/fetch_companies.py
+          python scripts/fetch_fatals.py
+
+      # 5  Build CSV and dashboard
+      - name: Build CSV + dashboard
+        run: |
+          python scripts/build_csv.py
+          python scripts/build_dashboard.py
+
+      # 6  Commit refreshed artefacts back to the repo
+      - name: Commit updated dashboard
+        run: |
+          git config user.name  github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+          git add docs/
