@@ -3,4 +3,6 @@ plotly
 openpyxl
 numpy
 rapidfuzz
-tqdm    # optional progress when you later fetch big datasets
+tqdm
+requests
+pyarrow           # for Parquet
