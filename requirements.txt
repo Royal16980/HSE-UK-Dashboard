@@ -1,3 +1,6 @@
 pandas
 plotly
 openpyxl
+numpy
+rapidfuzz
+tqdm    # optional progress when you later fetch big datasets
