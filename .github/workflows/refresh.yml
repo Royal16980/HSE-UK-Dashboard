@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # ← lets the workflow push back to the repo
 
     steps:
       # 1  Check out repo (pulls LFS files too)
@@ -32,24 +34,7 @@ jobs:
           python scripts/build_csv.py
           python scripts/build_dashboard.py
 
-      # 5  Commit refreshed artefacts
-      - name: Commit updated dashboard
-        run: |
-          git config user.name  github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add docs/*
-          git add data/reference/*.parquet || true
-          git commit -m "data: weekly refresh" || echo "Nothing new to commit"
-          git push
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write        # <-- lets the action push back to the repo
-    steps:
-      …                       # (everything above stays the same)
-
-      # 5  Commit refreshed artefacts
+      # 5  Commit refreshed artefacts back to the repo
       - name: Commit updated dashboard
         run: |
           git config user.name  github-actions[bot]
@@ -65,4 +50,3 @@ jobs:
 
           git commit -m "data: weekly refresh" || echo "Nothing new to commit"
           git push
-
