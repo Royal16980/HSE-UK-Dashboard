@@ -137,3 +137,8 @@ html_parts = [
 ]
 HTML.write_text("\n".join(html_parts), encoding="utf-8")
 print(f"Dashboard written → {HTML}")
+# Also append a link to the pending-cases CSV if it exists
+pend = Path(\"docs/pending_cases.csv\")
+if pend.exists():
+    link = f\"<p><a href='pending_cases.csv' download>Download pending-signals CSV</a></p>\"
+    HTML.write_text(\"\\n\".join(html_parts+[link]), encoding=\"utf-8\")
