@@ -9,4 +9,5 @@ pyarrow           # for Parquet
 beautifulsoup4
 lxml
 pdfplumber        # reads the HMCTS PDFs
-tqdm
+scikit-learn
+streamlit
